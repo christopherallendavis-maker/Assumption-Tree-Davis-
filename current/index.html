@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<!-- saved from url=(0093)file:///Users/cdavis21/Desktop/AISC/Applied%20Assumption%20Tree%20%E2%80%94%20Davis%20v4.html -->
+<!-- saved from url=(0103)file:///Users/cdavis21/Desktop/Personal/AISC/Applied%20Assumption%20Tree%20%E2%80%94%20Davis%202.2.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Applied Assumption Tree — AISC Team 19 — v2 (Current)</title>
+<title>Applied Assumption Tree — AISC Team 19</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
@@ -12,33 +12,39 @@
     font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
     background: #0F172A;
     color: #E2E8F0;
+    line-height: 1.45;
     min-height: 100vh;
-    padding: 30px 40px;
+    padding: 24px;
+  }
+
+  .canvas {
+    max-width: 1440px;
+    margin: 0 auto;
   }
 
   /* ===== HEADER ===== */
   .header {
     text-align: center;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
   }
   .header h1 {
-    font-size: 28px;
+    font-size: clamp(26px, 3.5vw, 34px);
     font-weight: 800;
     letter-spacing: -0.5px;
     color: white;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
   }
   .header .sub {
     font-size: 13px;
-    color: #64748B;
-    font-weight: 400;
+    color: #94A3B8;
+    font-weight: 500;
   }
 
   /* ===== INTERACTIVE ELEMENTS ===== */
   .interactive {
     position: relative;
     cursor: grab;
-    transition: box-shadow 0.15s;
+    transition: box-shadow 0.15s, transform 0.15s;
   }
   .interactive:active { cursor: grabbing; }
   .interactive.dragging { z-index: 500; opacity: 0.92; }
@@ -81,7 +87,7 @@
     padding: 18px 32px;
     text-align: center;
     max-width: 520px;
-    margin: 0 auto 12px;
+    margin: 0 auto 14px;
   }
   .root-banner h2 {
     font-size: 20px;
@@ -93,9 +99,9 @@
     display: inline-block;
     background: #F59E0B;
     color: #0F172A;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 800;
-    padding: 2px 10px;
+    padding: 3px 12px;
     border-radius: 10px;
     letter-spacing: 0.8px;
   }
@@ -119,8 +125,8 @@
   /* ===== BRANCH COLUMNS ===== */
   .branches {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 20px;
+    grid-template-columns: repeat(3, minmax(280px, 1fr));
+    gap: 18px;
     max-width: 1400px;
     margin: 0 auto;
   }
@@ -133,7 +139,7 @@
 
   /* Branch header (L1) */
   .branch-header {
-    padding: 14px 20px;
+    padding: 14px 18px;
     text-align: center;
     border-radius: 14px 14px 0 0;
   }
@@ -144,30 +150,51 @@
     margin-bottom: 2px;
   }
   .branch-header .gate {
-    font-size: 9px;
+    display: inline-block;
+    font-size: 10px;
     font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 8px;
     letter-spacing: 0.6px;
     text-transform: uppercase;
-    opacity: 0.8;
+    margin-top: 4px;
   }
+  .branch-blue .branch-header .gate { background: #1E3A5F; color: #60A5FA; }
+  .branch-green .branch-header .gate { background: #14532D; color: #4ADE80; }
+  .branch-gold .branch-header .gate { background: #713F12; color: #FDE047; }
   .branch-header .branch-num {
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 600;
     opacity: 0.6;
     margin-bottom: 4px;
   }
   .branch-header .formalism {
-    font-size: 10.5px;
+    font-size: 12px;
     font-weight: 400;
     font-style: italic;
-    opacity: 0.7;
+    color: #94A3B8;
+    opacity: 0.85;
+    margin-top: 5px;
+    line-height: 1.4;
+  }
+  .branch-header .formalism span {
+    font-size: inherit !important;
+  }
+  .branch-header .substitution-note {
     margin-top: 4px;
-    line-height: 1.35;
+    padding: 4px 10px;
+    background: rgba(59, 130, 246, 0.12);
+    border: 1px solid rgba(59, 130, 246, 0.25);
+    border-radius: 6px;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 11px;
+    color: #93C5FD;
   }
 
   /* Branch body */
   .branch-body {
-    padding: 12px 14px 14px;
+    padding: 12px;
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -198,57 +225,80 @@
     background: #1E293B;
     border-radius: 10px;
     border-left: 4px solid;
-    padding: 12px 14px;
+    padding: 14px;
   }
 
   .card-top {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 4px;
+    margin-bottom: 5px;
   }
   .card h4 {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 700;
     color: #F1F5F9;
     flex: 1;
   }
   .card .card-gate {
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 700;
     padding: 2px 8px;
     border-radius: 8px;
     letter-spacing: 0.5px;
     flex-shrink: 0;
   }
+
+  /* I-label accent for Branch 1 cards */
+  .i-label {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    color: #60A5FA;
+    background: #1E3A5F;
+    padding: 1px 8px;
+    border-radius: 6px;
+    margin-left: 4px;
+    letter-spacing: 0.3px;
+    vertical-align: baseline;
+  }
   .card .card-formalism {
-    font-size: 10px;
+    font-size: 12px;
     font-style: italic;
-    color: #64748B;
-    margin-bottom: 6px;
-    line-height: 1.3;
+    color: #8B9BB4;
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+  .card .card-formalism font {
+    font-size: inherit !important;
   }
 
   /* L3 items inside cards */
   .l3-list {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 6px;
   }
   .l3-item {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 8px;
-    font-size: 11.5px;
+    font-size: 13px;
     color: #94A3B8;
     font-weight: 500;
-    line-height: 1.3;
+    line-height: 1.4;
   }
   .l3-dot {
     width: 5px;
     height: 5px;
     border-radius: 50%;
     flex-shrink: 0;
+    margin-top: 6px;
+  }
+  /* Hide empty L3 items (stale editing artifacts) */
+  .l3-item:has(.l3-text:empty),
+  .l3-item:has(.l3-text > br:only-child) {
+    display: none;
   }
 
   /* ===== RISK AMPLIFIERS ===== */
@@ -268,14 +318,14 @@
     margin-bottom: 4px;
   }
   .amplifiers .amp-formalism {
-    font-size: 10px;
+    font-size: 12px;
     font-style: italic;
     color: #D97706;
-    opacity: 0.8;
+    opacity: 0.85;
     margin-bottom: 6px;
   }
   .amplifiers p {
-    font-size: 11px;
+    font-size: 12px;
     color: #D97706;
     line-height: 1.5;
   }
@@ -291,8 +341,8 @@
     padding: 12px 20px;
     background: #1E293B;
     border-radius: 10px;
-    font-size: 12px;
-    color: #64748B;
+    font-size: 13px;
+    color: #8B9BB4;
   }
   .formula-bar span { font-weight: 700; }
   .fb-blue { color: #60A5FA; }
@@ -307,8 +357,8 @@
     display: flex;
     justify-content: center;
     gap: 20px;
-    font-size: 11px;
-    color: #475569;
+    font-size: 12px;
+    color: #64748B;
     padding: 8px 16px;
     border-radius: 8px;
   }
@@ -320,17 +370,17 @@
   .legend-and {
     background: #F59E0B;
     color: #0F172A;
-    font-size: 8px;
+    font-size: 9px;
     font-weight: 800;
-    padding: 1px 6px;
+    padding: 2px 7px;
     border-radius: 6px;
   }
   .legend-or {
     background: #475569;
     color: white;
-    font-size: 8px;
+    font-size: 9px;
     font-weight: 800;
-    padding: 1px 6px;
+    padding: 2px 7px;
     border-radius: 6px;
   }
 
@@ -355,21 +405,39 @@
     transition: background 0.15s;
   }
   .toolbar button:hover { background: #334155; color: white; }
+
+  @media (max-width: 1180px) {
+    .branches {
+      grid-template-columns: repeat(2, minmax(280px, 1fr));
+    }
+  }
+
+  @media (max-width: 840px) {
+    body { padding: 16px; }
+    .branches {
+      grid-template-columns: 1fr;
+    }
+    .legend {
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+  }
 </style>
 </head>
 <body>
+<main class="canvas">
 
 <!-- HEADER -->
 <div class="header">
   <h1>Applied Assumption Tree</h1>
-  <div class="sub">Drag to move · Double-click to edit · Hover × to delete · Version: v2 (Current)</div>
 </div>
 
 <!-- ROOT -->
 <div class="root-banner interactive" id="el-root">
-  <h2 contenteditable="false">AI Causes Catastrophic Harm</h2>
-  <span class="gate" contenteditable="false">AND — ALL THREE BRANCHES REQUIRED</span>
-</div>
+  <h2>AI Leads to Catastrophic Harm<div>P(DAI) = &gt;0</div></h2>
+  <span class="gate">AND — ALL 3 BRANCHES MUST HOLD</span>
+<div class="delete-btn" title="Hide this element">×</div></div>
 
 <div class="connector"></div>
 
@@ -379,66 +447,62 @@
   <!-- ===== BRANCH 1: BLUE ===== -->
   <div class="branch branch-blue">
     <div class="branch-header interactive" id="el-b1-header">
-      <div class="branch-num" contenteditable="false"><br></div>
+      <div class="branch-num" contenteditable="false"></div>
       <h3 contenteditable="false">Optimization</h3>
-      <div class="gate" contenteditable="false">AND — all 4 conditions required</div>
-      <div class="formalism" contenteditable="false">The 4 I's determine optimization power O and capability function g(o); O applies to individual systems or aggregate ecosystem</div>
-    </div>
+      <div class="gate" contenteditable="false">AND — all 4 conditions are required</div>
+      <div class="formalism" contenteditable="false">The 4 I's determine the level of O, applies to individual AI systems or aggregate AI ecosystem</div>
+      <div class="formalism substitution-note" contenteditable="false">Each I must be &gt; 0, but they substitute at the margins — e.g., lower Intelligence with broad Influence can reach the same O.</div>
+    <div class="delete-btn" title="Hide this element">×</div></div>
     <div class="branch-body">
 
       <div class="card interactive" id="el-card-1">
         <div class="card-top">
-          <h4 contenteditable="false">Cognitive Competence (Intellgence)</h4>
-          <span class="card-gate" contenteditable="false">AND</span>
+          <h4 contenteditable="false">Cognitive Capability <span class="i-label">Intelligence</span></h4>
+          <span class="card-gate" style="display:none;" contenteditable="false"></span>
         </div>
-        <div class="card-formalism" contenteditable="false">&nbsp;</div>
+        <div class="card-formalism" contenteditable="false">Higher intelligence increases O</div>
         <div class="l3-list">
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">AI matches or exceeds human performance in a decisive domain.</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false"><br></span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false"><br></span></div>
+          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">AI matches or exceeds human performance in a decisive domain</span></div>
         </div>
-      </div>
+      <div class="delete-btn" title="Hide this element">×</div></div>
 
       <div class="card interactive" id="el-card-2">
         <div class="card-top">
-          <h4 contenteditable="false">Goal-Directed Behavior (Interest)</h4>
-          <span class="card-gate" contenteditable="false">AND</span>
-        </div>
-        <div class="card-formalism" contenteditable="false"><br></div>
-        <div class="l3-list">
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">AI actions exhibit stable patterns consistent with optimizing for identifiable outcomes.</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false"><br></span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false"><br></span></div>
-        </div>
-      </div>
-
-      <div class="card interactive" id="el-card-3">
-        <div class="card-top">
-          <h4 contenteditable="false">Real-World Influence (Influence)</h4>
+          <h4 contenteditable="false">Optimization Direction&nbsp;<span class="i-label">Interests</span></h4>
           <span class="card-gate" contenteditable="false">OR</span>
         </div>
-        <div class="card-formalism" contenteditable="false"><br></div>
+        <div class="card-formalism" contenteditable="false">Autonomous goal seeking behavior not required</div>
+        <div class="l3-list">
+          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">AI actions exhibit stable patterns consistent with optimizing for identifiable outcomes</span></div>
+          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">High impact capability under human direction even without stable autonomous goals</span></div>
+        </div>
+      <div class="delete-btn" title="Hide this element">×</div></div>
+
+      <div class="card interactive" id="el-card-3" style="transform: translate(0px, 0px);">
+        <div class="card-top">
+          <h4 contenteditable="false">Real-World Reach <span class="i-label">Influence</span></h4>
+          <span class="card-gate" contenteditable="false">OR</span>
+        </div>
+        <div class="card-formalism" contenteditable="false">Influence pathways convert O into real-world impact</div>
         <div class="l3-list">
           <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Digital system access</span></div>
           <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Robotic / physical actuators</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Social / persuasive influence</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false"><br></span></div>
+          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Human manipulation</span></div>
         </div>
-      </div>
+      <div class="delete-btn" title="Hide this element">×</div></div>
 
-      <div class="card interactive" id="el-card-4">
+      <div class="card interactive editing" id="el-card-4">
         <div class="card-top">
-          <h4 contenteditable="false">Resource Acquisition (Inputs)</h4>
-          <span class="card-gate" contenteditable="false">OR</span>
+          <h4 contenteditable="true">Resource Access&nbsp;<span class="i-label">Inputs</span></h4>
+          <span class="card-gate" contenteditable="true">OR</span>
         </div>
-        <div class="card-formalism" contenteditable="false"><br></div>
+        <div class="card-formalism" contenteditable="true">Resource access can increase O</div>
         <div class="l3-list">
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Compute / energy access</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Financial resources</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Human organizational leverage</span></div>
+          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="true">Compute / energy access</span></div>
+          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="true">Financial resources</span></div>
+          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="true"></span></div>
         </div>
-      </div>
-
+      <div class="delete-btn" title="Hide this element">×</div></div>
 
     </div>
   </div>
@@ -446,52 +510,51 @@
   <!-- ===== BRANCH 2: GREEN ===== -->
   <div class="branch branch-green">
     <div class="branch-header interactive" id="el-b2-header">
-      <div class="branch-num" contenteditable="false"><br></div>
-      <h3 contenteditable="false">Misalignment</h3>
-      <div class="gate" contenteditable="false">OR — any pathway sufficient</div>
-      <div class="formalism" contenteditable="false">O directed toward Doom, Determines misalignment probability p<sub>O</sub>(o)</div>
-    </div>
+      <div class="branch-num"></div>
+      <h3>Misalignment with Human Values</h3>
+      <div class="gate">OR — any pathway sufficient</div>
+      <div class="formalism">O directed away from "human flourishing", helps determine p_O(o)</div>
+    <div class="delete-btn" title="Hide this element">×</div></div>
     <div class="branch-body">
 
-      <div class="card interactive" id="el-card-5">
+      <div class="card interactive" id="el-card-5" style="transform: translate(0px, 0px);">
         <div class="card-top">
           <h4 contenteditable="false">Autonomous Misalignment (AI Takeover)</h4>
           <span class="card-gate" contenteditable="false">OR</span>
         </div>
-        <div class="card-formalism" contenteditable="false">High p<sub>O</sub>(o) at high O — system's own objectives diverge</div>
+        <div class="card-formalism" contenteditable="false">At high O, the system's objectives can diverge, raising p_O(o)</div>
         <div class="l3-list">
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Objectives differ from designers' intent in a misaligned way</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Alignment degrades over time or context</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">System conceals its true objectives</span></div>
+          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">There exists a difference between the optimized objective and the set of outcomes that preserve human survival, stability, or long term flourishing</span></div>
+          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Instrumental convergence drives power-seeking (or similar) behavior not compatible with human flourishing</span></div>
         </div>
-      </div>
+      <div class="delete-btn" title="Hide this element">×</div></div>
 
-      <div class="card interactive" id="el-card-6">
+      <div class="card interactive" id="el-card-6" style="transform: translate(-1px, 0px);">
         <div class="card-top">
-          <h4 contenteditable="false">Human Misuse (AI as Tool)</h4>
+          <h4 contenteditable="false">Human Misuse (AI as a tool)</h4>
           <span class="card-gate" contenteditable="false">OR</span>
         </div>
-        <div class="card-formalism" contenteditable="false">p<sub>O</sub>(o) depends on actor access and O levels</div>
+        <div class="card-formalism" contenteditable="false">p_O(o) depends on who has access and how much O they can use</div>
         <div class="l3-list">
           <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Intentional harmful use</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Unsafe deployment (insufficient safeguards)</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Harmful repurposing of capabilities</span></div>
+          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Unsafe deployment (negligent/accidental deployment)</span></div>
+          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Other human misuse causing D</span></div>
         </div>
-      </div>
+      <div class="delete-btn" title="Hide this element">×</div></div>
 
-      <div class="card interactive" id="el-card-7">
+      <div class="card interactive" id="el-card-7" style="transform: translate(0px, 0px);">
         <div class="card-top">
-          <h4 contenteditable="false">Structural / Emergent (Universe 25)</h4>
+          <h4 contenteditable="false">Structural / Emergent Dynamics&nbsp;</h4>
           <span class="card-gate" contenteditable="false">OR</span>
         </div>
-        <div class="card-formalism" contenteditable="false">p<sub>O</sub>(o) increases gradually as aggregate O increases</div>
+        <div class="card-formalism" contenteditable="false">p_O(o) can rise gradually as system-wide O increases</div>
         <div class="l3-list">
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Power concentration</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Institutional erosion</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Lock-in / irreversibility</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Multi-agent interaction failures</span></div>
+          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Preference / Incentive drift (Universe 25)</span></div>
+          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">System instability (key system failure e.g. market, power grid)</span></div>
+          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Critical dependence on AI systems (no human resilience)</span></div>
+          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Other structural/emergent dynamics causing D</span></div>
         </div>
-      </div>
+      <div class="delete-btn" title="Hide this element">×</div></div>
 
     </div>
   </div>
@@ -499,65 +562,68 @@
   <!-- ===== BRANCH 3: GOLD ===== -->
   <div class="branch branch-gold">
     <div class="branch-header interactive" id="el-b3-header">
-      <div class="branch-num" contenteditable="false"><br></div>
-      <h3 contenteditable="false">Failed Correction</h3>
-      <div class="gate" contenteditable="false">OR — any failure sufficient</div>
-      <div class="formalism" contenteditable="false">Environment E determines what level of O produces D</div>
-    </div>
+      <div class="branch-num"></div>
+      <h3>Failed Correction</h3>
+      <div class="gate">OR — any failure sufficient</div>
+      <div class="formalism">Environment E determines what level of O produces D</div>
+    <div class="delete-btn" title="Hide this element">×</div></div>
     <div class="branch-body">
 
       <div class="card interactive" id="el-card-8">
         <div class="card-top">
-          <h4>Detection Failure</h4>
-          <span class="card-gate">OR</span>
+          <h4 contenteditable="false">Detection Failure</h4>
+          <span class="card-gate" contenteditable="false">OR</span>
         </div>
-        <div class="card-formalism">Absent monitoring → E becomes permissive → g(o) and p<sub>O</sub>(o) unconstrained</div>
+        <div class="card-formalism" contenteditable="false">Weak monitoring makes E more permissive, increasing p_O(o)</div>
         <div class="l3-list">
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text">System behavior is opaque</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text">Active concealment</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text">Normalization / gradual harm</span></div>
+          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">System behavior is opaque</span></div>
+          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Active concealment</span></div>
+          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Normalization / gradual harm</span></div>
+          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Other detection failure</span></div>
         </div>
-      </div>
+      <div class="delete-btn" title="Hide this element">×</div></div>
 
       <div class="card interactive" id="el-card-9">
         <div class="card-top">
-          <h4>Willingness Failure</h4>
-          <span class="card-gate">OR</span>
+          <h4 contenteditable="false">Willingness Failure</h4>
+          <span class="card-gate" contenteditable="false">OR</span>
         </div>
-        <div class="card-formalism">Known risk but no action → E remains permissive → g(o) and p<sub>O</sub>(o) increase</div>
+        <div class="card-formalism" contenteditable="false">Known risk without action keeps E permissive, increasing p_O(o)</div>
         <div class="l3-list">
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text">Economic lock-in / dependency</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text">Political / regulatory capture</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text">Optimism bias / risk tolerance</span></div>
+          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Economic lock-in / dependency</span></div>
+          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Political / regulatory capture</span></div>
+          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Optimism bias / risk tolerance</span></div>
+          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Other willingness failure</span></div>
         </div>
-      </div>
+      <div class="delete-btn" title="Hide this element">×</div></div>
 
       <div class="card interactive" id="el-card-10">
         <div class="card-top">
-          <h4>Capability Failure</h4>
-          <span class="card-gate">OR</span>
+          <h4 contenteditable="false">Capability Failure</h4>
+          <span class="card-gate" contenteditable="false">OR</span>
         </div>
-        <div class="card-formalism">E cannot reduce p<sub>O</sub>(o) even when misalignment is detected</div>
+        <div class="card-formalism" contenteditable="false">Even when misalignment is detected, E may lack capacity to reduce p_O(o)</div>
         <div class="l3-list">
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text">Technical intractability</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text">Response speed mismatch</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text">Infrastructure integration lock-in</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text">Irreversible harm already realized</span></div>
+          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Technical intractability</span></div>
+          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Response speed mismatch</span></div>
+          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Infrastructure integration lock-in</span></div>
+          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Other capability failure</span></div>
         </div>
-      </div>
+      <div class="delete-btn" title="Hide this element">×</div></div>
 
-      <div class="card interactive" id="el-card-11">
+      <div class="card interactive" id="el-card-11" style="transform: translate(0px, 0px);">
         <div class="card-top">
-          <h4>Coordination Failure</h4>
-          <span class="card-gate">OR</span>
+          <h4 contenteditable="false">Coordination Failure</h4>
+          <span class="card-gate" contenteditable="false">OR</span>
         </div>
-        <div class="card-formalism">Fragmented governance → no binding E → g(o) and p<sub>O</sub>(o) unconstrained</div>
+        <div class="card-formalism" contenteditable="false">Fragmented governance weakens shared constraints in E, increasing p_O(o)</div>
         <div class="l3-list">
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text">Geopolitical competition</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text">Jurisdictional arbitrage</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text">Governance speed mismatch</span></div>
+          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Geopolitical competition</span></div>
+          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Failed or fragmented governance and regulation</span></div>
+          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Multipolar dynamics</span></div>
+          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Other coordination failure</span></div>
         </div>
-      </div>
+      <div class="delete-btn" title="Hide this element">×</div></div>
 
     </div>
   </div>
@@ -567,9 +633,9 @@
 <!-- RISK AMPLIFIERS -->
 <div class="amplifiers interactive" id="el-amplifiers">
   <h4>Risk Amplifiers</h4>
-  <div class="amp-formalism">Modify environment E, shifting multiple conditions simultaneously</div>
-  <p>Corporate incentive structures rewarding deployment speed over safety · Information asymmetry and secrecy between actors · Recursive self-improvement potential · Broad voluntary adoption of AI systems · Deployment pressure and race dynamics</p>
-</div>
+  <div class="amp-formalism">These factors shift E and can move multiple conditions at once.</div>
+  <p>Incentives that reward speed over safety · Information asymmetry and secrecy between actors · Recursive self-improvement potential · Broad voluntary AI adoption · Competitive deployment pressure and race dynamics</p>
+<div class="delete-btn" title="Hide this element">×</div></div>
 
 <!-- FORMULA BAR -->
 <div class="formula-bar interactive" id="el-formula" style="display: none;">
@@ -577,144 +643,164 @@
   <div><span class="fb-green">p<sub>O</sub>(o | M, E)</span> ← Branch 2</div>
   <div><span class="fb-gold">E (environment)</span> ← Branch 3</div>
   <div><span class="fb-white">P(Doom) = ∫ p<sub>O</sub> · g do</span></div>
-</div>
+<div class="delete-btn" title="Hide this element">×</div></div>
 
 <!-- LEGEND -->
 <div class="legend interactive" id="el-legend">
   <div class="legend-item"><span class="legend-and">AND</span> All sub-conditions required</div>
   <div class="legend-item"><span class="legend-or">OR</span> Any sub-condition sufficient</div>
-  <div class="legend-item">Double-click to edit · Hover × to delete</div>
-</div>
+  <div class="legend-item">Double-click to edit · Hover × to hide</div>
+<div class="delete-btn" title="Hide this element">×</div></div>
 
 <!-- TOOLBAR -->
 <div class="toolbar">
   <button onclick="resetAll()">Reset All</button>
 </div>
+</main>
 
 <script>
-/* ===== UNIFIED INTERACTIVE SYSTEM =====
-   Every .interactive element gets: drag, edit, delete, reset */
-
+/* Unified interactive behavior: drag, edit, hide, reset */
 const defaults = {};
+const state = new WeakMap();
 
-document.querySelectorAll('.interactive').forEach(el => {
-  // Store original state
-  defaults[el.id] = {
-    html: el.innerHTML,
-    display: el.style.display || '',
-    transform: ''
-  };
+function getTranslate(el) {
+  const match = el.style.transform.match(/translate\((-?[\d.]+)px,\s*(-?[\d.]+)px\)/);
+  return match ? { x: parseFloat(match[1]), y: parseFloat(match[2]) } : { x: 0, y: 0 };
+}
 
-  // --- DELETE BUTTON ---
+function ensureDeleteButton(el) {
+  const existing = el.querySelector(':scope > .delete-btn');
+  if (existing) existing.remove();
   const delBtn = document.createElement('div');
   delBtn.className = 'delete-btn';
   delBtn.textContent = '×';
-  delBtn.title = 'Delete this element';
-  delBtn.addEventListener('mousedown', (e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    el.style.display = 'none';
-  });
+  delBtn.title = 'Hide this element';
   el.appendChild(delBtn);
+}
 
-  // Update stored html to include delete button
-  defaults[el.id].html = el.innerHTML;
+function exitEdit(el) {
+  const current = state.get(el);
+  if (!current || !current.editing) return;
+  current.editing = false;
+  el.classList.remove('editing');
+  el.querySelectorAll('[contenteditable]').forEach(node => {
+    node.contentEditable = 'false';
+  });
+  window.getSelection().removeAllRanges();
+}
 
-  // --- DRAG ---
-  let isDragging = false;
-  let hasMoved = false;
-  let startX, startY, origTX, origTY;
-  let isEditing = false;
+function initializeInteractive(el) {
+  if (!el.id) return;
+  ensureDeleteButton(el);
 
-  // Parse current transform
-  function getTranslate() {
-    const match = el.style.transform.match(/translate\((-?[\d.]+)px,\s*(-?[\d.]+)px\)/);
-    return match ? { x: parseFloat(match[1]), y: parseFloat(match[2]) } : { x: 0, y: 0 };
-  }
+  defaults[el.id] = {
+    html: el.innerHTML,
+    display: el.style.display || '',
+    transform: el.style.transform || ''
+  };
+
+  state.set(el, {
+    editing: false,
+    dragging: false,
+    startX: 0,
+    startY: 0,
+    originX: 0,
+    originY: 0
+  });
 
   el.addEventListener('mousedown', (e) => {
-    // Don't drag when editing, or if clicking delete button
-    if (isEditing) return;
-    if (e.target.classList.contains('delete-btn')) return;
+    const current = state.get(el);
+    if (!current || current.editing) return;
+    if (e.target.closest('.delete-btn')) return;
 
-    isDragging = true;
-    hasMoved = false;
-    startX = e.clientX;
-    startY = e.clientY;
-    const t = getTranslate();
-    origTX = t.x;
-    origTY = t.y;
+    current.dragging = true;
+    current.startX = e.clientX;
+    current.startY = e.clientY;
+    const t = getTranslate(el);
+    current.originX = t.x;
+    current.originY = t.y;
     el.classList.add('dragging');
     e.preventDefault();
   });
 
-  document.addEventListener('mousemove', (e) => {
-    if (!isDragging) return;
-    const dx = e.clientX - startX;
-    const dy = e.clientY - startY;
-    if (Math.abs(dx) > 2 || Math.abs(dy) > 2) hasMoved = true;
-    el.style.transform = `translate(${origTX + dx}px, ${origTY + dy}px)`;
-  });
-
-  document.addEventListener('mouseup', () => {
-    if (isDragging) {
-      isDragging = false;
-      el.classList.remove('dragging');
-    }
-  });
-
-  // --- EDIT (double-click) ---
   el.addEventListener('dblclick', (e) => {
-    if (isEditing) return;
-    isEditing = true;
+    const current = state.get(el);
+    if (!current || current.editing) return;
+
+    current.editing = true;
     el.classList.add('editing');
 
-    // Find all editable text elements within
     const editables = el.querySelectorAll(
-      'h2, h3, h4, .gate, .formalism, .branch-num, ' +
-      '.l3-text, .card-gate, .card-formalism, .amp-formalism, ' +
-      'p, .legend-item, .fb-blue, .fb-green, .fb-gold, .fb-white'
+      'h2, h3, h4, .gate, .formalism, .branch-num, .l3-text, ' +
+      '.card-gate, .card-formalism, .amp-formalism, p, .legend-item, ' +
+      '.fb-blue, .fb-green, .fb-gold, .fb-white'
     );
-    editables.forEach(t => { t.contentEditable = 'true'; });
+    editables.forEach(node => {
+      node.contentEditable = 'true';
+    });
 
-    // Focus the clicked element or first editable
-    const target = e.target.closest('[contenteditable="false"]');
+    const target = e.target.closest('[contenteditable="true"]');
     if (target) target.focus();
     else if (editables.length) editables[0].focus();
-
     e.stopPropagation();
   });
 
-  // Exit edit on click outside
-  document.addEventListener('mousedown', (e) => {
-    if (isEditing && !el.contains(e.target)) {
-      exitEdit();
-    }
-  });
-
-  // Exit edit on Escape
   el.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') exitEdit();
+    if (e.key === 'Escape') exitEdit(el);
   });
+}
 
-  function exitEdit() {
-    isEditing = false;
-    el.classList.remove('editing');
-    el.querySelectorAll('[contenteditable]').forEach(t => {
-      t.contentEditable = 'false';
-    });
-    window.getSelection().removeAllRanges();
-  }
+document.querySelectorAll('.interactive').forEach(initializeInteractive);
+
+document.addEventListener('mousemove', (e) => {
+  document.querySelectorAll('.interactive').forEach(el => {
+    const current = state.get(el);
+    if (!current || !current.dragging) return;
+    const dx = e.clientX - current.startX;
+    const dy = e.clientY - current.startY;
+    el.style.transform = `translate(${current.originX + dx}px, ${current.originY + dy}px)`;
+  });
 });
 
-// --- RESET ALL ---
+document.addEventListener('mouseup', () => {
+  document.querySelectorAll('.interactive').forEach(el => {
+    const current = state.get(el);
+    if (!current || !current.dragging) return;
+    current.dragging = false;
+    el.classList.remove('dragging');
+  });
+});
+
+document.addEventListener('mousedown', (e) => {
+  const deleteBtn = e.target.closest('.delete-btn');
+  if (deleteBtn) {
+    e.preventDefault();
+    e.stopPropagation();
+    const host = deleteBtn.closest('.interactive');
+    if (host) host.style.display = 'none';
+    return;
+  }
+
+  document.querySelectorAll('.interactive').forEach(el => {
+    if (!el.contains(e.target)) exitEdit(el);
+  });
+});
+
 function resetAll() {
   document.querySelectorAll('.interactive').forEach(el => {
-    if (defaults[el.id]) {
-      el.style.display = defaults[el.id].display;
-      el.style.transform = '';
-      el.innerHTML = defaults[el.id].html;
-      el.classList.remove('editing', 'dragging');
+    const original = defaults[el.id];
+    if (!original) return;
+
+    el.style.display = original.display;
+    el.style.transform = original.transform;
+    el.innerHTML = original.html;
+    el.classList.remove('editing', 'dragging');
+    ensureDeleteButton(el);
+
+    const current = state.get(el);
+    if (current) {
+      current.editing = false;
+      current.dragging = false;
     }
   });
 }

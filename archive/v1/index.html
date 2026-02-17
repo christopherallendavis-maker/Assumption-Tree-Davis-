@@ -1,722 +1,398 @@
 <!DOCTYPE html>
-<!-- saved from url=(0093)file:///Users/cdavis21/Desktop/AISC/Applied%20Assumption%20Tree%20%E2%80%94%20Davis%20v4.html -->
+<!-- saved from url=(0240)file:///Users/cdavis21/Library/Application%20Support/Claude/local-agent-mode-sessions/6e95b8be-c14a-4855-aef9-11a56cf8a229/ad5d60c9-0066-4715-9b36-1aba9ae7739a/local_f1ef8237-a6af-4aa2-acf8-94423df2d833/outputs/Applied_Tree_Interactive.html -->
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Applied Assumption Tree — AISC Team 19 — v1 (Archive)</title>
+<title>Applied Assumption Tree — AISC Team 19</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
-    background: #0F172A;
-    color: #E2E8F0;
-    min-height: 100vh;
-    padding: 30px 40px;
-  }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #f8f9fa; overflow: auto; min-height: 100vh; }
 
-  /* ===== HEADER ===== */
-  .header {
-    text-align: center;
-    margin-bottom: 24px;
-  }
-  .header h1 {
-    font-size: 28px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-    color: white;
-    margin-bottom: 4px;
-  }
-  .header .sub {
-    font-size: 13px;
-    color: #64748B;
-    font-weight: 400;
-  }
-
-  /* ===== INTERACTIVE ELEMENTS ===== */
-  .interactive {
+  #canvas {
     position: relative;
+    width: 1400px;
+    height: 1000px;
+    margin: 20px auto;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+  }
+
+  .node {
+    position: absolute;
+    border-radius: 6px;
     cursor: grab;
+    user-select: none;
     transition: box-shadow 0.15s;
   }
-  .interactive:active { cursor: grabbing; }
-  .interactive.dragging { z-index: 500; opacity: 0.92; }
-  .interactive:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
-
-  /* Universal delete button */
-  .interactive > .delete-btn {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    background: #EF4444;
-    color: white;
-    border: 2px solid #0F172A;
-    font-size: 13px;
-    line-height: 18px;
-    text-align: center;
-    cursor: pointer;
-    display: none;
-    z-index: 10;
+  .node:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.18); z-index: 100; }
+  .node .delete-btn {
+    position: absolute; top: -8px; right: -8px;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: #E74C3C; color: white; border: 2px solid white;
+    font-size: 12px; line-height: 16px; text-align: center;
+    cursor: pointer; display: none; z-index: 400;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3);
   }
-  .interactive:hover > .delete-btn { display: block; }
-  .interactive.editing > .delete-btn { display: none; }
+  .node:hover .delete-btn { display: block; }
+  .node.editing .delete-btn { display: none; }
+  .node:active { cursor: grabbing; box-shadow: 0 6px 24px rgba(0,0,0,0.22); z-index: 200; }
 
-  /* Universal editing outline */
-  .interactive.editing {
-    outline: 2px solid #3B82F6;
-    outline-offset: 2px;
-    cursor: text;
-  }
+  .node-title { font-weight: 700; margin-bottom: 3px; }
+  .node-desc { font-size: 11px; color: #555; line-height: 1.35; }
+  .node-id { font-size: 10px; font-weight: 600; opacity: 0.7; margin-bottom: 2px; }
+  .node-logic { font-size: 9px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; opacity: 0.6; }
+
+  /* Editing mode */
+  .node.editing { cursor: text; outline: 2px solid #2196F3; outline-offset: 2px; z-index: 300 !important; }
+  .node.editing .node-title,
+  .node.editing .node-desc,
+  .node.editing .node-id,
+  .node.editing .node-logic { cursor: text; user-select: text; }
   [contenteditable]:focus { outline: none; }
 
-  /* ===== ROOT NODE ===== */
-  .root-banner {
-    background: linear-gradient(135deg, #1E293B 0%, #334155 100%);
-    border: 1px solid #475569;
-    border-radius: 12px;
-    padding: 18px 32px;
-    text-align: center;
-    max-width: 520px;
-    margin: 0 auto 12px;
-  }
-  .root-banner h2 {
-    font-size: 20px;
-    font-weight: 800;
-    color: white;
-    margin-bottom: 4px;
-  }
-  .root-banner .gate {
-    display: inline-block;
-    background: #F59E0B;
-    color: #0F172A;
-    font-size: 10px;
-    font-weight: 800;
-    padding: 2px 10px;
-    border-radius: 10px;
-    letter-spacing: 0.8px;
-  }
+  /* Root */
+  .root { background: #1B2A4A; color: white; padding: 14px 24px; text-align: center; width: 320px; }
+  .root .node-title { font-size: 16px; }
+  .root .node-logic { color: #90CAF9; }
 
-  /* ===== CONNECTOR ===== */
-  .connector {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 12px;
-    position: relative;
-  }
-  .connector::before {
-    content: '';
+  /* AND/OR badges */
+  .badge {
     position: absolute;
-    top: 0;
-    width: 2px;
-    height: 14px;
-    background: #475569;
-  }
-
-  /* ===== BRANCH COLUMNS ===== */
-  .branches {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 20px;
-    max-width: 1400px;
-    margin: 0 auto;
-  }
-
-  .branch {
+    width: 48px; height: 28px;
     border-radius: 14px;
-    padding: 0;
-    overflow: visible;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; color: white; letter-spacing: 0.5px;
+    cursor: grab;
   }
+  .badge-and { background: #2C3E50; }
+  .badge-or { background: #7F8C8D; }
 
-  /* Branch header (L1) */
-  .branch-header {
-    padding: 14px 20px;
-    text-align: center;
-    border-radius: 14px 14px 0 0;
-  }
-  .branch-header h3 {
-    font-size: 16px;
-    font-weight: 800;
-    color: white;
-    margin-bottom: 2px;
-  }
-  .branch-header .gate {
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 0.6px;
-    text-transform: uppercase;
-    opacity: 0.8;
-  }
-  .branch-header .branch-num {
-    font-size: 10px;
-    font-weight: 600;
-    opacity: 0.6;
-    margin-bottom: 4px;
-  }
-  .branch-header .formalism {
-    font-size: 10.5px;
-    font-weight: 400;
-    font-style: italic;
-    opacity: 0.7;
-    margin-top: 4px;
-    line-height: 1.35;
-  }
+  /* L1 nodes */
+  .l1 { padding: 10px 16px; width: 260px; text-align: center; }
+  .l1 .node-title { font-size: 14px; color: white; }
+  .l1 .node-logic { color: rgba(255,255,255,0.7); }
+  .l1-blue { background: #1B4F72; }
+  .l1-green { background: #1E8449; }
+  .l1-gold { background: #B7950B; }
 
-  /* Branch body */
-  .branch-body {
-    padding: 12px 14px 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    border-radius: 0 0 14px 14px;
-  }
-
-  /* Branch colors */
-  .branch-blue .branch-header { background: linear-gradient(135deg, #1E3A5F 0%, #1B4F72 100%); }
-  .branch-blue .branch-body { background: #0F2438; }
-  .branch-blue .card { border-left-color: #3B82F6; }
-  .branch-blue .card .card-gate { background: #1E3A5F; color: #60A5FA; }
-  .branch-blue .l3-dot { background: #3B82F6; }
-
-  .branch-green .branch-header { background: linear-gradient(135deg, #14532D 0%, #166534 100%); }
-  .branch-green .branch-body { background: #0A1F12; }
-  .branch-green .card { border-left-color: #22C55E; }
-  .branch-green .card .card-gate { background: #14532D; color: #4ADE80; }
-  .branch-green .l3-dot { background: #22C55E; }
-
-  .branch-gold .branch-header { background: linear-gradient(135deg, #713F12 0%, #854D0E 100%); }
-  .branch-gold .branch-body { background: #1A1207; }
-  .branch-gold .card { border-left-color: #EAB308; }
-  .branch-gold .card .card-gate { background: #713F12; color: #FDE047; }
-  .branch-gold .l3-dot { background: #EAB308; }
-
-  /* ===== L2 CARDS ===== */
-  .card {
-    background: #1E293B;
-    border-radius: 10px;
+  /* L2 nodes */
+  .l2 {
+    padding: 10px 14px;
+    width: 260px;
+    background: white;
     border-left: 4px solid;
-    padding: 12px 14px;
   }
+  .l2 .node-title { font-size: 13px; color: #2C3E50; }
+  .l2-blue { border-color: #1B4F72; box-shadow: 0 2px 8px rgba(27,79,114,0.12); }
+  .l2-blue .node-id { color: #1B4F72; }
+  .l2-green { border-color: #1E8449; box-shadow: 0 2px 8px rgba(30,132,73,0.12); }
+  .l2-green .node-id { color: #1E8449; }
+  .l2-gold { border-color: #B7950B; box-shadow: 0 2px 8px rgba(183,149,11,0.12); }
+  .l2-gold .node-id { color: #B7950B; }
 
-  .card-top {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 4px;
+  /* Risk amplifiers */
+  .amplifier {
+    padding: 10px 14px;
+    width: 280px;
+    background: #FFF8E1;
+    border: 2px dashed #E74C3C;
+    border-radius: 6px;
   }
-  .card h4 {
-    font-size: 13px;
-    font-weight: 700;
-    color: #F1F5F9;
-    flex: 1;
-  }
-  .card .card-gate {
-    font-size: 9px;
-    font-weight: 700;
-    padding: 2px 8px;
-    border-radius: 8px;
-    letter-spacing: 0.5px;
-    flex-shrink: 0;
-  }
-  .card .card-formalism {
-    font-size: 10px;
-    font-style: italic;
-    color: #64748B;
-    margin-bottom: 6px;
-    line-height: 1.3;
-  }
+  .amplifier .node-title { font-size: 12px; color: #E74C3C; }
+  .amplifier .node-desc { color: #666; }
 
-  /* L3 items inside cards */
-  .l3-list {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-  }
-  .l3-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 11.5px;
-    color: #94A3B8;
-    font-weight: 500;
-    line-height: 1.3;
-  }
-  .l3-dot {
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  /* ===== RISK AMPLIFIERS ===== */
-  .amplifiers {
-    max-width: 700px;
-    margin: 20px auto 0;
-    background: linear-gradient(135deg, #451A03 0%, #78350F 100%);
-    border: 1px dashed #D97706;
-    border-radius: 12px;
-    padding: 14px 22px;
-    text-align: center;
-  }
-  .amplifiers h4 {
-    font-size: 13px;
-    font-weight: 700;
-    color: #FDE047;
-    margin-bottom: 4px;
-  }
-  .amplifiers .amp-formalism {
-    font-size: 10px;
-    font-style: italic;
-    color: #D97706;
-    opacity: 0.8;
-    margin-bottom: 6px;
-  }
-  .amplifiers p {
-    font-size: 11px;
-    color: #D97706;
-    line-height: 1.5;
-  }
-
-  /* ===== FORMULA BAR ===== */
-  .formula-bar {
-    max-width: 1400px;
-    margin: 20px auto 0;
+  /* Mapping footer */
+  .mapping {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: #1B2A4A;
+    padding: 10px 30px;
     display: flex;
     justify-content: center;
-    gap: 24px;
-    flex-wrap: wrap;
-    padding: 12px 20px;
-    background: #1E293B;
-    border-radius: 10px;
+    gap: 30px;
+    align-items: center;
+    border-radius: 0 0 8px 8px;
     font-size: 12px;
-    color: #64748B;
+    color: #90A4AE;
   }
-  .formula-bar span { font-weight: 700; }
-  .fb-blue { color: #60A5FA; }
-  .fb-green { color: #4ADE80; }
-  .fb-gold { color: #FDE047; }
-  .fb-white { color: #F1F5F9; }
+  .mapping span { font-weight: 700; }
+  .map-blue { color: #5DADE2; }
+  .map-green { color: #58D68D; }
+  .map-gold { color: #F7DC6F; }
+  .map-white { color: white; }
 
-  /* ===== LEGEND ===== */
-  .legend {
-    max-width: 1400px;
-    margin: 14px auto 0;
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    font-size: 11px;
-    color: #475569;
-    padding: 8px 16px;
-    border-radius: 8px;
-  }
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-  .legend-and {
-    background: #F59E0B;
-    color: #0F172A;
-    font-size: 8px;
-    font-weight: 800;
-    padding: 1px 6px;
-    border-radius: 6px;
-  }
-  .legend-or {
-    background: #475569;
-    color: white;
-    font-size: 8px;
-    font-weight: 800;
-    padding: 1px 6px;
-    border-radius: 6px;
-  }
-
-  /* ===== TOOLBAR ===== */
+  /* Toolbar */
   .toolbar {
-    max-width: 1400px;
-    margin: 16px auto 0;
+    width: 1400px;
+    margin: 0 auto 10px;
     display: flex;
-    justify-content: center;
-    gap: 10px;
+    gap: 12px;
+    align-items: center;
+    padding: 8px 0;
   }
   .toolbar button {
-    padding: 6px 16px;
-    border: 1px solid #334155;
-    border-radius: 6px;
-    background: #1E293B;
-    color: #94A3B8;
+    padding: 6px 14px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: white;
     cursor: pointer;
-    font-size: 11px;
+    font-size: 12px;
     font-family: inherit;
-    font-weight: 500;
-    transition: background 0.15s;
   }
-  .toolbar button:hover { background: #334155; color: white; }
+  .toolbar button:hover { background: #f0f0f0; }
+  .toolbar .title { font-size: 18px; font-weight: 700; color: #1B2A4A; flex: 1; }
+  .toolbar .subtitle { font-size: 12px; color: #999; }
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
-<div class="header">
-  <h1>Applied Assumption Tree</h1>
-  <div class="sub">Drag to move · Double-click to edit · Hover × to delete · Version: v1 (Archive)</div>
-</div>
-
-<!-- ROOT -->
-<div class="root-banner interactive" id="el-root">
-  <h2 contenteditable="false">AI Causes Catastrophic Harm</h2>
-  <span class="gate" contenteditable="false">AND — ALL THREE BRANCHES REQUIRED</span>
-<div class="delete-btn" title="Delete this element">×</div><div class="delete-btn" title="Delete this element">×</div></div>
-
-<div class="connector"></div>
-
-<!-- THREE BRANCHES -->
-<div class="branches">
-
-  <!-- ===== BRANCH 1: BLUE ===== -->
-  <div class="branch branch-blue">
-    <div class="branch-header interactive" id="el-b1-header">
-      <div class="branch-num" contenteditable="false"><br></div>
-      <h3 contenteditable="false">Optimization</h3>
-      <div class="gate" contenteditable="false">AND — all 4 conditions required</div>
-      <div class="formalism" contenteditable="false">The 4 I's determine optimization power O and capability function g(o); O applies to individual systems or aggregate ecosystem</div>
-    <div class="delete-btn" title="Delete this element">×</div><div class="delete-btn" title="Delete this element">×</div></div>
-    <div class="branch-body">
-
-      <div class="card interactive" id="el-card-1" style="transform: translate(0px, -1px);">
-        <div class="card-top">
-          <h4 contenteditable="false">Cognitive Competence (Intellgence)</h4>
-          <span class="card-gate" contenteditable="false">AND</span>
-        </div>
-        <div class="card-formalism" contenteditable="false">&nbsp;</div>
-        <div class="l3-list">
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">AI matches or exceeds human performance in a decisive domain.</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false"><br></span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false"><br></span></div>
-        </div>
-      <div class="delete-btn" title="Delete this element">×</div><div class="delete-btn" title="Delete this element">×</div></div>
-
-      <div class="card interactive" id="el-card-2" style="transform: translate(0px, 0px);">
-        <div class="card-top">
-          <h4 contenteditable="false">Goal-Directed Behavior (Interest)</h4>
-          <span class="card-gate" contenteditable="false">AND</span>
-        </div>
-        <div class="card-formalism" contenteditable="false"><br></div>
-        <div class="l3-list">
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">AI actions exhibit stable patterns consistent with optimizing for identifiable outcomes.</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false"><br></span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false"><br></span></div>
-        </div>
-      <div class="delete-btn" title="Delete this element">×</div><div class="delete-btn" title="Delete this element">×</div></div>
-
-      <div class="card interactive" id="el-card-3" style="transform: translate(0px, 0px);">
-        <div class="card-top">
-          <h4 contenteditable="false">Real-World Influence (Influence)</h4>
-          <span class="card-gate" contenteditable="false">OR</span>
-        </div>
-        <div class="card-formalism" contenteditable="false"><br></div>
-        <div class="l3-list">
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Digital system access</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Robotic / physical actuators</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Social / persuasive influence</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false"><br></span></div>
-        </div>
-      <div class="delete-btn" title="Delete this element">×</div><div class="delete-btn" title="Delete this element">×</div></div>
-
-      <div class="card interactive" id="el-card-4">
-        <div class="card-top">
-          <h4 contenteditable="false">Resource Acquisition (Inputs)</h4>
-          <span class="card-gate" contenteditable="false">OR</span>
-        </div>
-        <div class="card-formalism" contenteditable="false"><br></div>
-        <div class="l3-list">
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Compute / energy access</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Financial resources</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Human organizational leverage</span></div>
-        </div>
-      <div class="delete-btn" title="Delete this element">×</div><div class="delete-btn" title="Delete this element">×</div></div>
-
-
-    </div>
-  </div>
-
-  <!-- ===== BRANCH 2: GREEN ===== -->
-  <div class="branch branch-green">
-    <div class="branch-header interactive" id="el-b2-header">
-      <div class="branch-num" contenteditable="false"><br></div>
-      <h3 contenteditable="false">Misalignment</h3>
-      <div class="gate" contenteditable="false">OR — any pathway sufficient</div>
-      <div class="formalism" contenteditable="false">O directed toward Doom, Determines misalignment probability p<sub>O</sub>(o)</div>
-    <div class="delete-btn" title="Delete this element">×</div><div class="delete-btn" title="Delete this element">×</div></div>
-    <div class="branch-body">
-
-      <div class="card interactive" id="el-card-5" style="transform: translate(0px, 0px);">
-        <div class="card-top">
-          <h4 contenteditable="false">Autonomous Misalignment (AI Takeover)</h4>
-          <span class="card-gate" contenteditable="false">OR</span>
-        </div>
-        <div class="card-formalism" contenteditable="false">High p<sub>O</sub>(o) at high O — system's own objectives diverge</div>
-        <div class="l3-list">
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Objectives differ from designers' intent in a misaligned way</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Alignment degrades over time or context</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">System conceals its true objectives</span></div>
-        </div>
-      <div class="delete-btn" title="Delete this element">×</div><div class="delete-btn" title="Delete this element">×</div></div>
-
-      <div class="card interactive" id="el-card-6" style="transform: translate(0px, 0px);">
-        <div class="card-top">
-          <h4 contenteditable="false">Human Misuse (AI as Tool)</h4>
-          <span class="card-gate" contenteditable="false">OR</span>
-        </div>
-        <div class="card-formalism" contenteditable="false">p<sub>O</sub>(o) depends on actor access and O levels</div>
-        <div class="l3-list">
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Intentional harmful use</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Unsafe deployment (insufficient safeguards)</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="false">Harmful repurposing of capabilities</span></div>
-        </div>
-      <div class="delete-btn" title="Delete this element">×</div><div class="delete-btn" title="Delete this element">×</div></div>
-
-      <div class="card interactive editing" id="el-card-7">
-        <div class="card-top">
-          <h4 contenteditable="true">Structural / Emergent (Universe 25)</h4>
-          <span class="card-gate" contenteditable="true">OR</span>
-        </div>
-        <div class="card-formalism" contenteditable="true">p<sub>O</sub>(o) increases gradually as aggregate O increases</div>
-        <div class="l3-list">
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="true">Power concentration</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="true">Institutional erosion</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="true">Lock-in / irreversibility</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text" contenteditable="true">Multi-agent interaction failures</span></div>
-        </div>
-      <div class="delete-btn" title="Delete this element">×</div><div class="delete-btn" title="Delete this element">×</div></div>
-
-    </div>
-  </div>
-
-  <!-- ===== BRANCH 3: GOLD ===== -->
-  <div class="branch branch-gold">
-    <div class="branch-header interactive" id="el-b3-header">
-      <div class="branch-num" contenteditable="false"><br></div>
-      <h3 contenteditable="false">Failed Correction</h3>
-      <div class="gate" contenteditable="false">OR — any failure sufficient</div>
-      <div class="formalism" contenteditable="false">Environment E determines what level of O produces D</div>
-    <div class="delete-btn" title="Delete this element">×</div><div class="delete-btn" title="Delete this element">×</div></div>
-    <div class="branch-body">
-
-      <div class="card interactive" id="el-card-8">
-        <div class="card-top">
-          <h4>Detection Failure</h4>
-          <span class="card-gate">OR</span>
-        </div>
-        <div class="card-formalism">Absent monitoring → E becomes permissive → g(o) and p<sub>O</sub>(o) unconstrained</div>
-        <div class="l3-list">
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text">System behavior is opaque</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text">Active concealment</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text">Normalization / gradual harm</span></div>
-        </div>
-      <div class="delete-btn" title="Delete this element">×</div><div class="delete-btn" title="Delete this element">×</div></div>
-
-      <div class="card interactive" id="el-card-9">
-        <div class="card-top">
-          <h4>Willingness Failure</h4>
-          <span class="card-gate">OR</span>
-        </div>
-        <div class="card-formalism">Known risk but no action → E remains permissive → g(o) and p<sub>O</sub>(o) increase</div>
-        <div class="l3-list">
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text">Economic lock-in / dependency</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text">Political / regulatory capture</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text">Optimism bias / risk tolerance</span></div>
-        </div>
-      <div class="delete-btn" title="Delete this element">×</div><div class="delete-btn" title="Delete this element">×</div></div>
-
-      <div class="card interactive" id="el-card-10">
-        <div class="card-top">
-          <h4>Capability Failure</h4>
-          <span class="card-gate">OR</span>
-        </div>
-        <div class="card-formalism">E cannot reduce p<sub>O</sub>(o) even when misalignment is detected</div>
-        <div class="l3-list">
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text">Technical intractability</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text">Response speed mismatch</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text">Infrastructure integration lock-in</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text">Irreversible harm already realized</span></div>
-        </div>
-      <div class="delete-btn" title="Delete this element">×</div><div class="delete-btn" title="Delete this element">×</div></div>
-
-      <div class="card interactive" id="el-card-11">
-        <div class="card-top">
-          <h4>Coordination Failure</h4>
-          <span class="card-gate">OR</span>
-        </div>
-        <div class="card-formalism">Fragmented governance → no binding E → g(o) and p<sub>O</sub>(o) unconstrained</div>
-        <div class="l3-list">
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text">Geopolitical competition</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text">Jurisdictional arbitrage</span></div>
-          <div class="l3-item"><span class="l3-dot"></span><span class="l3-text">Governance speed mismatch</span></div>
-        </div>
-      <div class="delete-btn" title="Delete this element">×</div><div class="delete-btn" title="Delete this element">×</div></div>
-
-    </div>
-  </div>
-
-</div>
-
-<!-- RISK AMPLIFIERS -->
-<div class="amplifiers interactive" id="el-amplifiers">
-  <h4>Risk Amplifiers</h4>
-  <div class="amp-formalism">Modify environment E, shifting multiple conditions simultaneously</div>
-  <p>Corporate incentive structures rewarding deployment speed over safety · Information asymmetry and secrecy between actors · Recursive self-improvement potential · Broad voluntary adoption of AI systems · Deployment pressure and race dynamics</p>
-<div class="delete-btn" title="Delete this element">×</div><div class="delete-btn" title="Delete this element">×</div></div>
-
-<!-- FORMULA BAR -->
-<div class="formula-bar interactive" id="el-formula" style="display: none;">
-  <div><span class="fb-blue">g(o | C, I, R, E)</span> ← Branch 1</div>
-  <div><span class="fb-green">p<sub>O</sub>(o | M, E)</span> ← Branch 2</div>
-  <div><span class="fb-gold">E (environment)</span> ← Branch 3</div>
-  <div><span class="fb-white">P(Doom) = ∫ p<sub>O</sub> · g do</span></div>
-<div class="delete-btn" title="Delete this element">×</div><div class="delete-btn" title="Delete this element">×</div></div>
-
-<!-- LEGEND -->
-<div class="legend interactive" id="el-legend">
-  <div class="legend-item"><span class="legend-and">AND</span> All sub-conditions required</div>
-  <div class="legend-item"><span class="legend-or">OR</span> Any sub-condition sufficient</div>
-  <div class="legend-item">Double-click to edit · Hover × to delete</div>
-<div class="delete-btn" title="Delete this element">×</div><div class="delete-btn" title="Delete this element">×</div></div>
-
-<!-- TOOLBAR -->
 <div class="toolbar">
-  <button onclick="resetAll()">Reset All</button>
+  <div>
+    <div class="title">Applied Assumption Tree</div>
+    <div class="subtitle">AISC Team 19 — Drag to move · Double-click to edit · Hover × to delete · Reset restores all</div>
+  </div>
+  <button onclick="resetPositions()">Reset Layout</button>
+  <button onclick="exportPNG()">Export as PNG</button>
+</div>
+
+<div id="canvas">
+
+  <!-- ROOT NODE -->
+  <div class="node root" id="L0" style="left: 521px; top: 22px;">
+    <div class="node-title" contenteditable="false">AI Causes Catastrophic Harm</div>
+    <div class="node-logic" contenteditable="false">All three branches required (AND)</div>
+  <div class="delete-btn" title="Delete this node">×</div></div>
+
+  <!-- AND badge -->
+  <div class="node badge badge-and" id="AND-root" style="left: 415px; top: 141px; display: none;">AND<div class="delete-btn" title="Delete this node">×</div></div>
+
+  <!-- L1 NODES -->
+  <div class="node l1 l1-blue" id="L1-1" style="left: 197px; top: 125px;">
+    <div class="node-title" contenteditable="false">Powerful Optimization<div>(The 4 I's determine Optimization Power, O and g(o))</div></div>
+    <div class="node-logic" contenteditable="false">AND — 4 sub-nodes</div>
+  <div class="delete-btn" title="Delete this node">×</div></div>
+
+  <div class="node l1 l1-green" id="L1-2" style="left: 542px; top: 114px;">
+    <div class="node-title" contenteditable="false">Misalignment<div>(Optimization Power directed towards Doom, D determines p_O(o))</div></div>
+    <div class="node-logic" contenteditable="false">OR — 3 sub-nodes</div>
+  <div class="delete-btn" title="Delete this node">×</div></div>
+
+  <div class="node l1 l1-gold" id="L1-3" style="left: 886px; top: 114px;">
+    <div class="node-title" contenteditable="false">Failed Correction<div>(Environment, E determines what level of O produces D)</div></div>
+    <div class="node-logic" contenteditable="false">OR — 4 sub-nodes</div>
+  <div class="delete-btn" title="Delete this node">×</div></div>
+
+  <!-- BRANCH 1 L2 NODES (Blue) -->
+  <div class="node l2 l2-blue" id="L2-1" style="left: 195px; top: 222px;">
+    <div class="node-title" contenteditable="false">Cognitive Competence (Intelligence)</div>
+    <div class="node-desc" contenteditable="false">AI matches or exceeds top human performance in at least one domain decisive for causing catastrophic harm.</div>
+  <div class="delete-btn" title="Delete this node">×</div></div>
+
+  <div class="node l2 l2-blue" id="L2-2" style="left: 192px; top: 334px;">
+    <div class="node-title" contenteditable="false">Goal-Directed Behavior (Interest)</div>
+    <div class="node-desc" contenteditable="false">AI actions exhibit stable patterns consistent with optimizing for identifiable outcomes.&nbsp;&nbsp;</div>
+  <div class="delete-btn" title="Delete this node">×</div></div>
+
+  <div class="node l2 l2-blue" id="L2-3" style="left: 194px; top: 431px;">
+    <div class="node-title" contenteditable="false">Real-World Influence (Influence)</div>
+    <div class="node-desc" contenteditable="false">AI can affect real world states through at least one channel: digital infrastructure; robotic/physical actuators; or manipulation of humans</div>
+  <div class="delete-btn" title="Delete this node">×</div></div>
+
+  <div class="node l2 l2-blue" id="L2-4" style="left: 195px; top: 542px;">
+    <div class="node-title" contenteditable="false">Resource Acquisition (Inputs)</div>
+    <div class="node-desc" contenteditable="false">AI can obtain and sustain the energy and compute needed for continued operation.</div>
+  <div class="delete-btn" title="Delete this node">×</div></div>
+
+  <!-- BRANCH 2 L2 NODES (Green) -->
+  <div class="node l2 l2-green" id="L2-5" style="left: 540px; top: 233px;">
+    <div class="node-title" contenteditable="false">Doom Outcome #1: AI Takeover<div><i style="font-weight: normal;">(High p_O(o) at high O levels)</i></div></div>
+    <div class="node-desc" contenteditable="false">AI pursues goals misaligned with human welfare on its own. Deceptive alignment, mesa-optimization, Goodhart failures.</div>
+  <div class="delete-btn" title="Delete this node">×</div></div>
+
+  <div class="node l2 l2-green" id="L2-6" style="left: 541px; top: 343px;">
+    <div class="node-title" contenteditable="false">Doom Outcome #2: Human Misuse<div><i style="font-weight: normal;">(p_O(o) depends on malicious actor access and O levels)</i></div></div>
+    <div class="node-desc" contenteditable="false">Humans deliberately or negligently deploy AI causing catastrophic harm. Weaponization, oppression, reckless deployment.</div>
+  <div class="delete-btn" title="Delete this node">×</div></div>
+
+  <div class="node l2 l2-green" id="L2-7" style="left: 541px; top: 483px;">
+    <div class="node-title" contenteditable="false">Doom Outcome #3: Structural / Emergent Harm<div><span style="font-weight: normal;"><i>(p_O(o) increases gradually as O increases)</i></span></div></div>
+    <div class="node-desc" contenteditable="false">No single actor intends catastrophe, but systemic effects cause it. Power concentration, institutional erosion, lost agency.</div>
+  <div class="delete-btn" title="Delete this node">×</div></div>
+
+  <!-- BRANCH 3 L2 NODES (Gold) -->
+  <div class="node l2 l2-gold" id="L2-8" style="left: 881px; top: 224px;">
+    <div class="node-title" contenteditable="false">Detection Failure<div><i style="font-weight: normal;">(Restrictive E due to monitoring, compute controls reduces g(o) and p_O(o))</i></div></div>
+    <div class="node-desc" contenteditable="false">Threat not recognized until it is too late to intervene.&nbsp; Interpretability insufficient, system conceals behavior, harm too diffuse to register.</div>
+  <div class="delete-btn" title="Delete this node">×</div></div>
+
+  <div class="node l2 l2-gold" id="L2-9" style="left: 881px; top: 387px;">
+    <div class="node-title" contenteditable="false">Willingness Failure<div><span style="font-weight: normal;"><i>(Permissive E with no limits on O or safety controls causes g(o) and p_O(o) to increase)</i></span></div></div>
+    <div class="node-desc" contenteditable="false">Threat is recognized but humans choose not to act.&nbsp; Race dynamics, competitive pressure, economic interests prevent action.</div>
+  <div class="delete-btn" title="Delete this node">×</div></div>
+
+  <div class="node l2 l2-gold" id="L2-10" style="left: 881px; top: 553px;">
+    <div class="node-title" contenteditable="false">Capability Failure<div><span style="font-weight: normal;"><i>(E prevents p_0(o) from being reduced, we can't stop it)</i></span></div></div>
+    <div class="node-desc" contenteditable="false">System too capable to shut down, technical controls insufficient.</div>
+  <div class="delete-btn" title="Delete this node">×</div></div>
+
+  <div class="node l2 l2-gold" id="L2-11" style="left: 878px; top: 671px;">
+    <div class="node-title" contenteditable="false">Coordination Failure<div><i style="font-weight: normal;">(Restrictive E due to regulations, governance reduces g(o) and p_O(o))</i></div></div>
+    <div class="node-desc" contenteditable="false">Individual actions could potentially act but fail collectively. Race dynamics, geopolitical competition, fragmented governance.</div>
+  <div class="delete-btn" title="Delete this node">×</div></div>
+
+  <!-- RISK AMPLIFIERS -->
+  <div class="node amplifier" id="amplifiers" style="left: 530px; top: 658px;">
+    <div class="node-title" contenteditable="false">Risk Amplifiers&nbsp;<div><span style="font-weight: normal;"><i>(Impact Environment to increase g(o) and p_O(o))</i></span></div></div>
+    <div class="node-desc" contenteditable="false">Race dynamics, information asymmetry and secrecy between actors, corporate incentive structures that reward deployment speed at the expense of safety, recursive self improvement potential, broad voluntary adoption of AI systems.</div>
+  <div class="delete-btn" title="Delete this node">×</div></div>
+
+  <!-- MAPPING FOOTER -->
+  <div class="mapping">
+    <div><span class="map-blue">g(o | C, I, R, E)</span> ← Branch 1</div>
+    <div><span class="map-green">p_O(o | M, E)</span> ← Branch 2</div>
+    <div><span class="map-gold">E (environment)</span> ← Branch 3</div>
+    <div><span class="map-white">P(Doom) = ∫ p_O · g do</span></div>
+  </div>
+
 </div>
 
 <script>
-/* ===== UNIFIED INTERACTIVE SYSTEM =====
-   Every .interactive element gets: drag, edit, delete, reset */
-
+// Store default positions and content for reset
 const defaults = {};
 
-document.querySelectorAll('.interactive').forEach(el => {
-  // Store original state
-  defaults[el.id] = {
-    html: el.innerHTML,
-    display: el.style.display || '',
-    transform: ''
+document.querySelectorAll('.node').forEach(node => {
+  defaults[node.id] = {
+    left: node.style.left,
+    top: node.style.top,
+    html: node.innerHTML,
+    classes: node.className
   };
 
-  // --- DELETE BUTTON ---
+  // Add delete button
   const delBtn = document.createElement('div');
   delBtn.className = 'delete-btn';
   delBtn.textContent = '×';
-  delBtn.title = 'Delete this element';
+  delBtn.title = 'Delete this node';
   delBtn.addEventListener('mousedown', (e) => {
     e.stopPropagation();
     e.preventDefault();
-    el.style.display = 'none';
+    node.style.display = 'none';
   });
-  el.appendChild(delBtn);
+  node.appendChild(delBtn);
 
-  // Update stored html to include delete button
-  defaults[el.id].html = el.innerHTML;
+  // Update stored html after adding delete button
+  defaults[node.id].html = node.innerHTML;
 
-  // --- DRAG ---
-  let isDragging = false;
-  let hasMoved = false;
-  let startX, startY, origTX, origTY;
+  let offsetX, offsetY, isDragging = false, hasMoved = false;
   let isEditing = false;
 
-  // Parse current transform
-  function getTranslate() {
-    const match = el.style.transform.match(/translate\((-?[\d.]+)px,\s*(-?[\d.]+)px\)/);
-    return match ? { x: parseFloat(match[1]), y: parseFloat(match[2]) } : { x: 0, y: 0 };
-  }
-
-  el.addEventListener('mousedown', (e) => {
-    // Don't drag when editing, or if clicking delete button
+  // Make all text children editable on double-click
+  node.addEventListener('dblclick', (e) => {
     if (isEditing) return;
-    if (e.target.classList.contains('delete-btn')) return;
+    enterEditMode(node);
+    e.stopPropagation();
+  });
+
+  node.addEventListener('mousedown', (e) => {
+    // If in edit mode, let normal text selection work
+    if (isEditing) return;
 
     isDragging = true;
     hasMoved = false;
-    startX = e.clientX;
-    startY = e.clientY;
-    const t = getTranslate();
-    origTX = t.x;
-    origTY = t.y;
-    el.classList.add('dragging');
+    offsetX = e.clientX - node.offsetLeft;
+    offsetY = e.clientY - node.offsetTop;
+    node.style.zIndex = 200;
     e.preventDefault();
   });
 
   document.addEventListener('mousemove', (e) => {
     if (!isDragging) return;
-    const dx = e.clientX - startX;
-    const dy = e.clientY - startY;
-    if (Math.abs(dx) > 2 || Math.abs(dy) > 2) hasMoved = true;
-    el.style.transform = `translate(${origTX + dx}px, ${origTY + dy}px)`;
+    hasMoved = true;
+    const canvas = document.getElementById('canvas');
+    let newX = e.clientX - offsetX;
+    let newY = e.clientY - offsetY;
+    newX = Math.max(0, Math.min(newX, canvas.offsetWidth - node.offsetWidth));
+    newY = Math.max(0, Math.min(newY, canvas.offsetHeight - node.offsetHeight - 40));
+    node.style.left = newX + 'px';
+    node.style.top = newY + 'px';
   });
 
   document.addEventListener('mouseup', () => {
     if (isDragging) {
       isDragging = false;
-      el.classList.remove('dragging');
+      if (!hasMoved) node.style.zIndex = '';
+      else setTimeout(() => { node.style.zIndex = ''; }, 100);
     }
   });
 
-  // --- EDIT (double-click) ---
-  el.addEventListener('dblclick', (e) => {
-    if (isEditing) return;
+  function enterEditMode(n) {
     isEditing = true;
-    el.classList.add('editing');
+    n.classList.add('editing');
+    n.style.cursor = 'text';
+    // Make each text element editable
+    n.querySelectorAll('.node-title, .node-desc, .node-id, .node-logic').forEach(el => {
+      el.contentEditable = 'true';
+    });
+    // Focus the title or first editable element
+    const firstEditable = n.querySelector('.node-title') || n.querySelector('[contenteditable]');
+    if (firstEditable) firstEditable.focus();
+  }
 
-    // Find all editable text elements within
-    const editables = el.querySelectorAll(
-      'h2, h3, h4, .gate, .formalism, .branch-num, ' +
-      '.l3-text, .card-gate, .card-formalism, .amp-formalism, ' +
-      'p, .legend-item, .fb-blue, .fb-green, .fb-gold, .fb-white'
-    );
-    editables.forEach(t => { t.contentEditable = 'true'; });
-
-    // Focus the clicked element or first editable
-    const target = e.target.closest('[contenteditable="true"]');
-    if (target) target.focus();
-    else if (editables.length) editables[0].focus();
-
-    e.stopPropagation();
-  });
-
-  // Exit edit on click outside
+  // Exit edit mode when clicking outside
   document.addEventListener('mousedown', (e) => {
-    if (isEditing && !el.contains(e.target)) {
-      exitEdit();
+    if (isEditing && !node.contains(e.target)) {
+      exitEditMode(node);
     }
   });
 
-  // Exit edit on Escape
-  el.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') exitEdit();
+  // Also exit on Escape
+  node.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      exitEditMode(node);
+    }
   });
 
-  function exitEdit() {
+  function exitEditMode(n) {
     isEditing = false;
-    el.classList.remove('editing');
-    el.querySelectorAll('[contenteditable]').forEach(t => {
-      t.contentEditable = 'false';
+    n.classList.remove('editing');
+    n.style.cursor = '';
+    n.querySelectorAll('[contenteditable]').forEach(el => {
+      el.contentEditable = 'false';
+      // Remove any lingering selection
+      window.getSelection().removeAllRanges();
     });
-    window.getSelection().removeAllRanges();
   }
 });
 
-// --- RESET ALL ---
-function resetAll() {
-  document.querySelectorAll('.interactive').forEach(el => {
-    if (defaults[el.id]) {
-      el.style.display = defaults[el.id].display;
-      el.style.transform = '';
-      el.innerHTML = defaults[el.id].html;
-      el.classList.remove('editing', 'dragging');
+// Click on canvas background exits any editing
+document.getElementById('canvas').addEventListener('mousedown', (e) => {
+  if (e.target.id === 'canvas') {
+    document.querySelectorAll('.node.editing').forEach(n => {
+      n.classList.remove('editing');
+      n.style.cursor = '';
+      n.querySelectorAll('[contenteditable]').forEach(el => {
+        el.contentEditable = 'false';
+      });
+      window.getSelection().removeAllRanges();
+    });
+  }
+});
+
+function resetPositions() {
+  document.querySelectorAll('.node').forEach(node => {
+    if (defaults[node.id]) {
+      node.style.left = defaults[node.id].left;
+      node.style.top = defaults[node.id].top;
+      node.style.display = '';  // restore deleted nodes
+      node.innerHTML = defaults[node.id].html;
+      node.classList.remove('editing');
     }
   });
+}
+
+function exportPNG() {
+  alert('To export: use your browser\'s screenshot tool (Cmd+Shift+4 on Mac, Win+Shift+S on Windows) to capture the tree after arranging it.');
 }
 </script>
 
